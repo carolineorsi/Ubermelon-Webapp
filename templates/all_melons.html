@@ -1,4 +1,9 @@
-{% extends 'base.html' %}
+{% if isLogged == "yes"%}
+    {% extends 'base2.html' %}
+{% else %}
+    {% extends 'base.html' %}
+{% endif %}
+
 {% block body %}
 <h2>Top Selling Melons</h2>
 

@@ -1,7 +1,14 @@
 
 
-{% extends 'base.html' %}
+{% extends 'base2.html' %}
 {% block body %}
-<h1> You are logged in, {{first}} {{last}} </h1>. <br>
+<h1> You are logged in, {{first}} {{last}} </h1>
+
+<ul>
+<li><a href ='/melons'>Buy Melons</a></li>
+<li><a href ='/cart'>View Cart</a></li>
+<li><a href ='/logout'>Log Out</a></li>
+
+</ul>
 
 {% endblock %}

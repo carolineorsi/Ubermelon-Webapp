@@ -7,9 +7,13 @@ app = Flask(__name__)
 app.secret_key = '\xf5!\x07!qj\xa4\x08\xc6\xf8\n\x8a\x95m\xe2\x04g\xbb\x98|U\xa2f\x03'
 app.jinja_env.undefined = jinja2.StrictUndefined
 
+
+
 @app.route("/")
 def index():
     """This is the 'cover' page of the ubermelon site"""
+    if 'isLogged' not in session:
+        session['isLogged'] = "no"
     return render_template("index.html")
 
 @app.route("/melons")
@@ -17,7 +21,7 @@ def list_melons():
     """This is the big page showing all the melons ubermelon has to offer"""
     melons = model.get_melons()
     return render_template("all_melons.html",
-                           melon_list = melons)
+                           melon_list = melons, isLogged=session['isLogged'])
 
 @app.route("/melon/<int:id>")
 def show_melon(id):
@@ -26,7 +30,7 @@ def show_melon(id):
     melon = model.get_melon_by_id(id)
     print melon
     return render_template("melon_details.html",
-                  display_melon = melon)
+                  display_melon = melon, isLogged = session['isLogged'])
 
 @app.route("/cart")
 def shopping_cart():
@@ -41,6 +45,8 @@ def shopping_cart():
 
     if 'cart' not in session:
         session['cart'] = []
+        session['isLogged'] = 'no'      
+
         
     else:
         melon_ids = session['cart']
@@ -67,7 +73,7 @@ def shopping_cart():
     
     total = format_price(total)
 
-    return render_template("cart.html", melon_info=melon_info, total = total)
+    return render_template("cart.html", melon_info=melon_info, total = total, isLogged=session['isLogged'])
 
 @app.route("/add_to_cart/<int:id>")
 def add_to_cart(id):
@@ -100,15 +106,35 @@ def process_login():
     if customer == None:
         flash("Customer does not exist.")
         return redirect(url_for('process_login'))
+    elif (password != customer.password):
+        flash("Wrong password.")
+        return redirect(url_for('process_login'))
+
     else: 
         session['email'] = customer.email
         session['givenname'] = customer.givenname
         session['lastname'] = customer.surname
-        return render_template("loggedin.html",first = session['givenname'], last = session['lastname'])
+        session['isLogged'] = "yes"
+#        return render_template("loggedin.html",first = session['givenname'], last = session['lastname'])
+        return redirect(url_for('show_account'))
 
     """TODO: Receive the user's login credentials located in the 'request.form'
     dictionary, look up the user, and store them in the session."""
     return "Oops! This needs to be implemented"
+
+@app.route("/account")
+def show_account():
+    return render_template("loggedin.html",first = session['givenname'], last = session['lastname'])
+
+
+
+@app.route("/logout")
+def log_out():
+    session.clear()
+    session['isLogged'] = "no"
+    # session['cart'] = []
+    
+    return redirect(url_for("show_login"))
 
 
 @app.route("/checkout")

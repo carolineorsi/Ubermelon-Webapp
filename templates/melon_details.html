@@ -1,4 +1,8 @@
-{% extends 'base.html' %}
+{% if isLogged == "yes"%}
+    {% extends 'base2.html' %}
+{% else %}
+    {% extends 'base.html' %}
+{% endif %}
 {% block body %}
 <h2>{{ display_melon.common_name }}</h2>
 <img class="product-img" src="{{display_melon.imgurl}}">
